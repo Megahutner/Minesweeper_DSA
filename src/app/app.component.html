@@ -1,7 +1,7 @@
 
     <div>
-      <dx-popup [width]="405" [height]="150"  [dragEnabled]="true"
-      [closeOnOutsideClick]="true" [(visible)]="dificultyPopup" title = "Dificulty">
+      <dx-popup [width]="405" [height]="150" [showCloseButton] = 'false'
+      [closeOnOutsideClick]="false" [(visible)]="dificultyPopup" title = "Difficulty" >
     
       <div style = "align-content: center;">
         <dx-button style="margin:10px;"  icon="less"  text="Easy"
@@ -20,6 +20,35 @@
     <div class="grid" [style.height.px]="height" [style.width.px]="width" (click)= "leftClick($event)" (contextmenu)="rightClick($event)" >
       <canvas #myCanvas style="position: absolute;"></canvas>
     </div>
+
+
+
+    <div>
+      <dx-popup [width]="405" [height]="150"  [showCloseButton] = 'false'
+      [closeOnOutsideClick]="false" [(visible)]="gameoverPopup" title = "Game Over">
+    
+      <div style = "align-content: center;">
+        <dx-button style="margin-left:60px;"  icon="redo"  text="Retry"
+        type="normal" (onClick)="retry()"></dx-button>
+        <dx-button style="margin-left:20px;"  icon="menu" text="Dificulty"
+        type="normal" (onClick)="changeDifficulty()"></dx-button>
+      </div>
+    </dx-popup>
+    </div>
+    <div>
+      <dx-popup [width]="405" [height]="150"  [showCloseButton] = 'false'
+      [closeOnOutsideClick]="false" [(visible)]="winPopup" title = "Congratulations">
+    
+      <div style = "align-content: center;">
+        <dx-button style="margin-left:60px;"  icon="redo"  text="Retry"
+        type="normal" (onClick)="retry()"></dx-button>
+        <dx-button style="margin-left:20px;"  icon="menu" text="Dificulty"
+        type="normal" (onClick)="changeDifficulty()"></dx-button>
+      </div>
+    </dx-popup>
+    </div>
+
+
   
 
   

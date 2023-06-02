@@ -23,7 +23,6 @@ export class AppComponent implements OnInit, DoCheck{
     Mine : 1 ,
   }
   // general variables
-  MineBlocks: any = [];
   width: any;
   height: any;
   shapedimension: any;
@@ -34,16 +33,18 @@ export class AppComponent implements OnInit, DoCheck{
   mine: any;
   color: any;
   empty: any;
+  
 
 
   // popup flags
   dificultyPopup: boolean = true;
   gameoverPopup : boolean = false;
   winPopup: boolean = false;
+  sidebar: boolean = false;
 
   
 
-  ngOnInit(): void {
+  ngOnInit(): void { // initializing value 
     enum Color {
       "#7FFF00",
       "#0000FF",
@@ -90,6 +91,9 @@ export class AppComponent implements OnInit, DoCheck{
       this.mine = 99;
       this.empty = 477;
     }
+    if(this.currentDificulty === data){
+      this.drawBoard();
+    }
     this.currentDificulty = data;
     this.dificultyPopup = false;
   }
@@ -111,43 +115,39 @@ export class AppComponent implements OnInit, DoCheck{
         let y = j * this.shapedimension;
         let isOpened = false;
         let isFlagged = false;
-        let neighbors = new Array();
         ctx.fillStyle = "#696969";
         ctx.fillRect(x, y, this.shapedimension, this.shapedimension);
 
         ctx.strokeStyle = "#0000ff";
         ctx.lineWidth   = 2;
         ctx.strokeRect(x, y, this.shapedimension, this.shapedimension);
-        this.shapes[i][j] = { x, y,i,j, type, neighbors, isOpened , isFlagged};
+        this.shapes[i][j] = { x, y, type, isOpened , isFlagged};
       }
     }
     let mineCount = 0;
     while(mineCount < this.mine){
        let tempI = Math.floor(Math.random()* this.shapes.length);
        let tempJ = Math.floor(Math.random()* this.shapes[0].length);
-       console.log(tempI,tempJ);
        if(this.shapes[tempI][tempJ].type === 1){
         continue;
        }
        else{
         this.shapes[tempI][tempJ].type = 1;
         mineCount++;
-        this.MineBlocks.push(this.shapes[tempI][tempJ]);
+        //this.MineBlocks.push(this.shapes[tempI][tempJ]);
        }
     }
-    console.log(this.MineBlocks);
-    //this.shapes[0][0].type = 1;
+    //this.shapes[0][0].type = 1; //for testing purpose
   }
 
 
   rightClick(e:any){
-    e.preventDefault();
-    console.log(e.offsetX , e.offsetY );
+    e.preventDefault(); // prevent regular right click event on web
     for(let i = 0; i< this.shapes.length; i++){
       for(let j = 0; j< this.shapes[0].length; j++){
         if(e.offsetX > this.shapes[i][j].x && e.offsetX <= this.shapes[i][j].x + this.shapedimension
           && e.offsetY > this.shapes[i][j].y && e.offsetY <= this.shapes[i][j].y + this.shapedimension){
-            console.log(this.shapes[i][j])
+            if(!this.shapes[i][j].isOpened){
             const ctx: CanvasRenderingContext2D = this.canvasRef.nativeElement.getContext('2d');
             if(!this.shapes[i][j].isFlagged){
               if(this.flagCount > 0){
@@ -180,7 +180,7 @@ export class AppComponent implements OnInit, DoCheck{
               ctx.strokeRect(this.shapes[i][j].x, this.shapes[i][j].y, this.shapedimension, this.shapedimension);
               this.flagCount++;
             }
-           
+          }
           }
       }
     }
@@ -195,16 +195,14 @@ export class AppComponent implements OnInit, DoCheck{
       for(let j = 0; j< this.shapes[0].length; j++){
         if(e.offsetX > this.shapes[i][j].x && e.offsetX <= this.shapes[i][j].x + this.shapedimension
           && e.offsetY > this.shapes[i][j].y && e.offsetY <= this.shapes[i][j].y + this.shapedimension){
-            console.log(this.shapes[i][j])
             const ctx: CanvasRenderingContext2D = this.canvasRef.nativeElement.getContext('2d');
             if(!this.shapes[i][j].isFlagged){
-              if(this.shapes[i][j].type === 1) // if block has mine
+              if(this.shapes[i][j].type === this.BlockType.Mine) // if block has mine
               {
                 this.gameOver();
               } 
               else{
-                console.log("open")
-                this.openNeighborBlocks(i,j);
+                this.openBlock(i,j);
                 if(this.empty === 0){
                   this.winPopup = true;
                 }
@@ -215,22 +213,20 @@ export class AppComponent implements OnInit, DoCheck{
       }
     }
 
-    openNeighborBlocks(i: number, j: number){
+    openBlock(i: number, j: number){
       if(!this.shapes[i][j].isOpened && !this.shapes.isFlagged){
       const ctx: CanvasRenderingContext2D = this.canvasRef.nativeElement.getContext('2d');
-      if(this.shapes[i][j].type === 0 ){
+      if(this.shapes[i][j].type === this.BlockType.Empty ){
         var neighborMineCount = 0;        
         for(let x = i-1; x <= i+1; x++) {
           for(let y = j-1; y<= j+1;y++){
             if((x >= 0 && x < this.shapes.length) && (y >=0 && y< this.shapes[0].length)){
-              console.log(x,y)
-            if(this.shapes[x][y].type === 1){
+            if(this.shapes[x][y].type === this.BlockType.Mine){
               neighborMineCount++;
             }
           }
           }
         }
-        console.log(neighborMineCount)
         if(neighborMineCount === 0){
           ctx.clearRect(this.shapes[i][j].x, this.shapes[i][j].y, this.shapedimension,  this.shapedimension );
           ctx.fillStyle = "#F0F8FF";
@@ -241,23 +237,23 @@ export class AppComponent implements OnInit, DoCheck{
           this.shapes[i][j].isOpened = true;
           this.empty --;
           if(i - 1 >= 0){
-            this.openNeighborBlocks(i - 1, j);
+            this.openBlock(i - 1, j);
           }
           if(j - 1 >= 0){
-            this.openNeighborBlocks(i, j -1);
+            this.openBlock(i, j -1);
           }
           if(i + 1 < this.shapes.length){
-            this.openNeighborBlocks(i + 1, j);
+            this.openBlock(i + 1, j);
           }
           if(j + 1 < this.shapes[0].length){
-            this.openNeighborBlocks(i, j + 1);
+            this.openBlock(i, j + 1);
           }
         }
         else{
           ctx.clearRect(this.shapes[i][j].x, this.shapes[i][j].y, this.shapedimension,  this.shapedimension );
           ctx.fillStyle = this.color[neighborMineCount-1];
           ctx.textAlign = "center";
-          ctx.font = "30px Arial"
+          ctx.font = "30px Arial";
           ctx.fillText(`${neighborMineCount}`,this.shapes[i][j].x + this.shapedimension/2,this.shapes[i][j].y + this.shapedimension/1.5);
           ctx.strokeStyle = "#0000ff";
           ctx.lineWidth   = 2;
@@ -272,7 +268,7 @@ export class AppComponent implements OnInit, DoCheck{
       const ctx: CanvasRenderingContext2D = this.canvasRef.nativeElement.getContext('2d');
       for(let i = 0; i< this.shapes.length; i++){
         for(let j = 0; j< this.shapes[0].length; j++){
-          if(this.shapes[i][j].type === 1){ 
+          if(this.shapes[i][j].type === this.BlockType.Mine){ 
           this.shapes[i][j].isOpened = true;  
           let flag = new Image();
           flag.src = "assets/mine.png";
@@ -298,7 +294,7 @@ export class AppComponent implements OnInit, DoCheck{
     retry(){
       this.gameoverPopup = false;
       this.dificultyPopup = false;
-      this.gameoverPopup = false;
+      this.winPopup = false;
       this.selectDificulty(this.currentDificulty); // reset variables
       this.drawBoard();
     }
@@ -308,6 +304,26 @@ export class AppComponent implements OnInit, DoCheck{
       this.dificultyPopup = true;
       this.winPopup = false;
     }
+
+
+    toolbarContent = [{
+      widget: 'dxButton',
+      location: 'before',
+      options: {
+        icon: 'menu',
+        onClick: () => this.dificultyPopup = !this.dificultyPopup,
+      },
+    },
+    {
+      widget: 'dxButton',
+      location: 'before',
+      options: {
+        icon: 'redo',
+        onClick: () => this.selectDificulty(this.currentDificulty),
+      },
+    },
+  ];
+  
   }
 
 

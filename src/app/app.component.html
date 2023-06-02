@@ -1,7 +1,13 @@
 
+    <dx-toolbar [items] = "toolbarContent"></dx-toolbar>
+    <!-- <dx-drawer [(opened)] = "sidebar" [closeOnOutsideClick]="false"
+    openedStateMode = "overlap"
+    position = "left"
+    revealMode = "slide"
+    ></dx-drawer> -->
     <div>
       <dx-popup [width]="405" [height]="150" [showCloseButton] = 'false'
-      [closeOnOutsideClick]="false" [(visible)]="dificultyPopup" title = "Difficulty" >
+      [closeOnOutsideClick]="false" [(visible)]="dificultyPopup" title = "Difficulty" [closeOnOutsideClick]="true">
     
       <div style = "align-content: center;">
         <dx-button style="margin:10px;"  icon="less"  text="Easy"

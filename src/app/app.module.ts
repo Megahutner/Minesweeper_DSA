@@ -27,6 +27,8 @@ import {
   DxCheckBoxModule,
   DxNumberBoxModule,
   DxTooltipModule,
+  DxToolbarModule,
+  DxDrawerModule
 } from "devextreme-angular";
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -62,6 +64,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     DxSwitchModule,
     DxTabPanelModule,
     AppRoutingModule,
+    DxToolbarModule,
+    DxDrawerModule,
     FontAwesomeModule
   ],
   providers: [],

@@ -33,6 +33,10 @@ export class AppComponent implements OnInit, DoCheck{
   mine: any;
   color: any;
   empty: any;
+  timer: any;
+  interval: any;
+  timedisplay: any;
+
   
 
 
@@ -99,6 +103,9 @@ export class AppComponent implements OnInit, DoCheck{
   }
 
   drawBoard(){
+    this.timedisplay ="0:0"
+    this.resetTime();
+    this.timeElapsed();
     const cw = Math.fround(this.width );
     const ch = Math.fround(this.height );
     this.canvasRef.nativeElement.width = cw;
@@ -200,11 +207,13 @@ export class AppComponent implements OnInit, DoCheck{
               if(this.shapes[i][j].type === this.BlockType.Mine) // if block has mine
               {
                 this.gameOver();
+                this.stopTime();
               } 
               else{
                 this.openBlock(i,j);
                 if(this.empty === 0){
                   this.winPopup = true;
+                  this.stopTime();
                 }
               } 
               }
@@ -323,6 +332,34 @@ export class AppComponent implements OnInit, DoCheck{
       },
     },
   ];
+
+
+  timeElapsed(){
+
+    this.interval = setInterval(()=>{
+      if(this.timer === 0){
+        this.timer++;
+      }
+      else{
+        this.timer++;
+      }
+      this.timedisplay = this.format(this.timer);
+      console.log(this.timedisplay);
+    },1000)
+  }
+
+  format(time: number){
+    const minutes = Math.floor(time/60);
+    return minutes+ ':' + (time - minutes * 60);
+  }
+
+  stopTime(){
+    clearInterval(this.interval);
+  }
+  resetTime(){
+    clearInterval(this.interval);
+    this.timer = 0;
+  }
   
   }
 
